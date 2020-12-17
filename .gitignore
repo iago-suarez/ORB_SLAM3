@@ -48,6 +48,7 @@ lib/
 
 cmake_modules/
 cmake-build-*
+*build-android-*
 *.idea*
 
 *.pyc
