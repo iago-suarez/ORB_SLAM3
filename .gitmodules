@@ -1,9 +1,6 @@
 [submodule "Thirdparty/eigen"]
 	path = Thirdparty/eigen
 	url = https://gitlab.com/libeigen/eigen.git
-[submodule "Thirdparty/Pangolin"]
-	path = Thirdparty/Pangolin
-	url = https://github.com/stevenlovegrove/Pangolin.git
 [submodule "Thirdparty/Boost-for-Android"]
 	path = Thirdparty/Boost-for-Android
 	url = https://github.com/moritz-wundke/Boost-for-Android.git
