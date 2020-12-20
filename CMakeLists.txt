@@ -41,10 +41,6 @@ else()
     MESSAGE("-- Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
 endif(ANDROID)
 
-find_package(Pangolin REQUIRED)
-message("-- Pangolin_FOUND=${Pangolin_FOUND}")
-message("-- Pangolin_INCLUDE_DIRS=${Pangolin_INCLUDE_DIRS}")
-
 include_directories(
 ${PROJECT_SOURCE_DIR}
 ${PROJECT_SOURCE_DIR}/include
@@ -82,23 +78,32 @@ src/OptimizableTypes.cpp
 src/MLPnPsolver.cpp
 src/TwoViewReconstruction.cc)
 
-add_subdirectory(Thirdparty/g2o)
+
+set(DBoW2_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/Thirdparty/DBoW2/include)
 if(ANDROID)
-set(DBoW2_DIR ${CMAKE_SOURCE_DIR}/Thirdparty/DBoW2/install-${ANDROID_ABI}/lib/cmake/DBoW2)
+    set(DBoW2_LIBS ${CMAKE_SOURCE_DIR}/Thirdparty/DBoW2/build-${ANDROID_ABI}/libDBoW2.so)
+    set(g2o_LIBS ${CMAKE_SOURCE_DIR}/Thirdparty/g2o/build-${ANDROID_ABI}/libg2o.so)
+    set(Pangolin_DIR ${CMAKE_SOURCE_DIR}/Thirdparty/Pangolin/install-${ANDROID_ABI}/lib/cmake/Pangolin)
 else(ANDROID)
-set(DBoW2_DIR ${CMAKE_SOURCE_DIR}/Thirdparty/DBoW2/install/lib/cmake/DBoW2)
+    set(DBoW2_LIBS ${CMAKE_SOURCE_DIR}/Thirdparty/DBoW2/build/libDBoW2.so)
+    set(g2o_LIBS ${CMAKE_SOURCE_DIR}/Thirdparty/g2o/build/libg2o.so)
+    set(Pangolin_DIR ${CMAKE_SOURCE_DIR}/Thirdparty/Pangolin/install/lib/cmake/Pangolin)
 endif(ANDROID)
-find_package(DBoW2)
-MESSAGE(-- DBoW2_LIBS=${DBoW2_LIBS})
-MESSAGE(-- DBoW2_INCLUDE_DIRS=${DBoW2_INCLUDE_DIRS})
+
+MESSAGE("-- DBoW2_LIBS=${DBoW2_LIBS}")
+MESSAGE("-- DBoW2_INCLUDE_DIRS=${DBoW2_INCLUDE_DIRS}")
 include_directories(${DBoW2_INCLUDE_DIRS})
+
+find_package(Pangolin REQUIRED)
+message("-- Pangolin_FOUND=${Pangolin_FOUND}")
+message("-- Pangolin_INCLUDE_DIRS=${Pangolin_INCLUDE_DIRS}")
 
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
 ${DBoW2_LIBS}
-g2o
+${g2o_LIBS}
 -lboost_serialization
 -lcrypto
 )

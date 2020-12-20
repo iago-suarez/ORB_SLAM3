@@ -18,9 +18,9 @@
 
 #include "TwoViewReconstruction.h"
 
-#include "Thirdparty/DBoW2/DUtils/Random.h"
+#include "DBoW2/Random.h"
 
-#include<thread>
+#include <thread>
 
 
 using namespace std;

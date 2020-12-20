@@ -18,7 +18,7 @@
 
 #include "Initializer.h"
 
-#include "Thirdparty/DBoW2/DUtils/Random.h"
+#include "DBoW2/Random.h"
 
 #include "Optimizer.h"
 #include "ORBmatcher.h"
