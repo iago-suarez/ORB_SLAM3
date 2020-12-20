@@ -7,50 +7,43 @@ ENDIF()
 
 MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
-#set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
-#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
-
-# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-deprecated -O3 -march=native ")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated -O3 -march=native")
-
-# Check C++11 or C++0x support
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-   add_definitions(-DCOMPILEDWITHC11)
-   message(STATUS "Using flag -std=c++11.")
-elseif(COMPILER_SUPPORTS_CXX0X)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-   add_definitions(-DCOMPILEDWITHC0X)
-   message(STATUS "Using flag -std=c++0x.")
-else()
-   message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wdeprecated-declarations -O3 -Wno-deprecated")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wdeprecated-declarations -O3 -Wno-deprecated")
+set (CMAKE_CXX_STANDARD 11)
+add_definitions(-DCOMPILEDWITHC11)
 
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
-find_package(OpenCV)
+find_package(OpenCV REQUIRED COMPONENTS opencv_core opencv_calib3d opencv_highgui)
 if(NOT OpenCV_FOUND)
-   find_package(OpenCV 2.4.3 QUIET)
+   find_package(OpenCV 2.4.3 QUIET opencv_core opencv_calib3d)
    if(NOT OpenCV_FOUND)
       message(FATAL_ERROR "OpenCV > 2.4.3 not found.")
    endif()
 endif()
 
-MESSAGE("OPENCV VERSION:")
-MESSAGE(${OpenCV_VERSION})
+MESSAGE("-- OPENCV VERSION: ${OpenCV_VERSION}")
 
-IF(ANDROID)
-   SET(EIGEN3_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/Thirdparty/eigen)
-ELSE(ANDROID)
-   find_package(Eigen3 3.1.0 REQUIRED)
-ENDIF(ANDROID)
+SET(EIGEN3_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/Thirdparty/eigen)
+
+if(ANDROID)
+    SET(Boost_VERBOSE True)
+    SET(BOOST_VERSION 1_74)
+    SET(Boost_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/Thirdparty/Boost-for-Android/build/out/${ANDROID_ABI}/include/boost-${BOOST_VERSION})
+    MESSAGE("-- Including Android boost: BOOST_INCLUDE_DIR=${BOOST_INCLUDE_DIR}")
+    SET(Boost_LIBRARY_DIRS ${CMAKE_SOURCE_DIR}/Thirdparty/Boost-for-Android/build/out/${ANDROID_ABI}/lib)
+    INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+    LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+else()
+    find_package(Boost)
+    MESSAGE("-- Boost_FOUND: ${Boost_FOUND}")
+    MESSAGE("-- Boost_VERSION_STRING: ${Boost_VERSION_STRING}")
+    MESSAGE("-- Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+endif(ANDROID)
 
 find_package(Pangolin REQUIRED)
+message("-- Pangolin_FOUND=${Pangolin_FOUND}")
+message("-- Pangolin_INCLUDE_DIRS=${Pangolin_INCLUDE_DIRS}")
 
 include_directories(
 ${PROJECT_SOURCE_DIR}
@@ -59,8 +52,6 @@ ${PROJECT_SOURCE_DIR}/include/CameraModels
 ${EIGEN3_INCLUDE_DIR}
 ${Pangolin_INCLUDE_DIRS}
 )
-
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
 add_library(${PROJECT_NAME} SHARED
 src/System.cc
@@ -89,50 +80,30 @@ src/CameraModels/Pinhole.cpp
 src/CameraModels/KannalaBrandt8.cpp
 src/OptimizableTypes.cpp
 src/MLPnPsolver.cpp
-include/System.h
-include/Tracking.h
-include/LocalMapping.h
-include/LoopClosing.h
-include/ORBextractor.h
-include/ORBmatcher.h
-include/FrameDrawer.h
-include/Converter.h
-include/MapPoint.h
-include/KeyFrame.h
-include/Atlas.h
-include/Map.h
-include/MapDrawer.h
-include/Optimizer.h
-include/PnPsolver.h
-include/Frame.h
-include/KeyFrameDatabase.h
-include/Sim3Solver.h
-include/Initializer.h
-include/Viewer.h
-include/ImuTypes.h
-include/G2oTypes.h
-include/CameraModels/GeometricCamera.h
-include/CameraModels/Pinhole.h
-include/CameraModels/KannalaBrandt8.h
-include/OptimizableTypes.h
-include/MLPnPsolver.h
-include/TwoViewReconstruction.h
 src/TwoViewReconstruction.cc)
 
 add_subdirectory(Thirdparty/g2o)
+if(ANDROID)
+set(DBoW2_DIR ${CMAKE_SOURCE_DIR}/Thirdparty/DBoW2/install-${ANDROID_ABI}/lib/cmake/DBoW2)
+else(ANDROID)
+set(DBoW2_DIR ${CMAKE_SOURCE_DIR}/Thirdparty/DBoW2/install/lib/cmake/DBoW2)
+endif(ANDROID)
+find_package(DBoW2)
+MESSAGE(-- DBoW2_LIBS=${DBoW2_LIBS})
+MESSAGE(-- DBoW2_INCLUDE_DIRS=${DBoW2_INCLUDE_DIRS})
+include_directories(${DBoW2_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
-${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
-${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
+${DBoW2_LIBS}
+g2o
 -lboost_serialization
 -lcrypto
 )
 
-
-# Build examples
+############################## Executalbes ##############################
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/RGB-D)
 add_executable(rgbd_tum
@@ -153,7 +124,6 @@ target_link_libraries(stereo_euroc ${PROJECT_NAME})
 add_executable(stereo_tum_vi
 Examples/Stereo/stereo_tum_vi.cc)
 target_link_libraries(stereo_tum_vi ${PROJECT_NAME})
-
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/Monocular)
 

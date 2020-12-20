@@ -26,6 +26,10 @@ using namespace cv;
 #endif
 #include<mutex>
 
+#ifndef GLubyte
+#define GLubyte std::uint8_t
+#endif
+
 namespace ORB_SLAM3
 {
 
