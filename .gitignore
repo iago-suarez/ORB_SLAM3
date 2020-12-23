@@ -41,6 +41,9 @@ Thirdparty/g2o/build-*
 Thirdparty/g2o/cmake-build-*
 Thirdparty/g2o/config.h
 Thirdparty/g2o/lib/
+Thirdparty/Pangolin/install*
+Thirdparty/Pangolin/build*
+Thirdparty/Pangolin/cmake-build-*
 Vocabulary/ORBvoc.txt
 build/
 

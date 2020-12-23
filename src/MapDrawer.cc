@@ -130,6 +130,7 @@ void MapDrawer::DrawMapPoints()
     if(vpMPs.empty())
         return;
 
+#ifndef ANDROID
     glPointSize(mPointSize);
     glBegin(GL_POINTS);
     glColor3f(0.0,0.0,0.0);
@@ -157,6 +158,9 @@ void MapDrawer::DrawMapPoints()
     }
 
     glEnd();
+#else
+    // TODO Implement for Android OpenGL ES 2
+#endif
 }
 
 void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const bool bDrawInertialGraph)
@@ -179,6 +183,7 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
 
             glMultMatrixf(Twc.ptr<GLfloat>(0));
 
+#ifndef ANDROID
             if(!pKF->GetParent()) // It is the first KF in the map
             {
                 glLineWidth(mKeyFrameLineWidth*5);
@@ -247,6 +252,9 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
             }*/
 
             glEnd();
+#else
+            // TODO Implement for Android OpenGL ES 2
+#endif
         }
     }
 
@@ -254,6 +262,7 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
     {
         glLineWidth(mGraphLineWidth);
         glColor4f(0.0f,1.0f,0.0f,0.6f);
+#ifndef ANDROID
         glBegin(GL_LINES);
 
         // cout << "-----------------Draw graph-----------------" << endl;
@@ -296,12 +305,16 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
         }
 
         glEnd();
+#else
+        // TODO Implement for Android OpenGL ES 2
+#endif
     }
 
     if(bDrawInertialGraph && mpAtlas->isImuInitialized())
     {
         glLineWidth(mGraphLineWidth);
         glColor4f(1.0f,0.0f,0.0f,0.6f);
+#ifndef ANDROID
         glBegin(GL_LINES);
 
         //Draw inertial links
@@ -319,6 +332,9 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
         }
 
         glEnd();
+#else
+        // TODO Implement for Android OpenGL ES 2
+#endif
     }
 
     vector<Map*> vpMaps = mpAtlas->GetAllMaps();
@@ -342,6 +358,7 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
 
                 glMultMatrixf(Twc.ptr<GLfloat>(0));
 
+#ifndef ANDROID
                 if(!vpKFs[i]->GetParent()) // It is the first KF in the map
                 {
                     glLineWidth(mKeyFrameLineWidth*5);
@@ -379,6 +396,9 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
                 glEnd();
 
                 glPopMatrix();
+#else
+                // TODO Implement for Android OpenGL ES 2
+#endif
             }
         }
     }
@@ -400,6 +420,8 @@ void MapDrawer::DrawCurrentCamera(pangolin::OpenGlMatrix &Twc)
 
     glLineWidth(mCameraLineWidth);
     glColor3f(0.0f,1.0f,0.0f);
+#ifndef ANDROID
+
     glBegin(GL_LINES);
     glVertex3f(0,0,0);
     glVertex3f(w,h,z);
@@ -422,7 +444,9 @@ void MapDrawer::DrawCurrentCamera(pangolin::OpenGlMatrix &Twc)
     glVertex3f(-w,-h,z);
     glVertex3f(w,-h,z);
     glEnd();
-
+#else
+    // TODO Implement for Android OpenGL ES 2
+#endif
     glPopMatrix();
 }
 

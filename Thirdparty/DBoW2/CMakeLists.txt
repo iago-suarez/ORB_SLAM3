@@ -12,15 +12,23 @@ set(SRCS_DBOW2
         lib/Random.cpp
         lib/Timestamp.cpp)
 
-find_package(OpenCV 3.0 QUIET)
-if(NOT OpenCV_FOUND)
-   find_package(OpenCV 2.4.3 QUIET)
-   if(NOT OpenCV_FOUND)
-      message(FATAL_ERROR "OpenCV > 2.4.3 not found.")
-   endif()
-endif()
+find_package(OpenCV 4 REQUIRED)
+
+if(ANDROID)
+    set(Boost_VERBOSE True)
+    set(BOOST_VERSION 1_74)
+    set(BOOST_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/../Boost-for-Android/build/out/${ANDROID_ABI}/include/boost-${BOOST_VERSION})
+    message("-- Including Android boost: BOOST_INCLUDE_DIR=${BOOST_INCLUDE_DIR}")
+    set(BOOST_LIBS_DIR ${PROJECT_SOURCE_DIR}/../Boost-for-Android/build/out/${ANDROID_ABI}/lib)
+    include_directories(${BOOST_INCLUDE_DIR})
+endif(ANDROID)
+
+set(LIB_TYPE SHARED)
+if(STATIC_LIB)
+    set(LIB_TYPE STATIC)
+endif(STATIC_LIB)
 
 include_directories(${OpenCV_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/include)
-add_library(DBoW2 SHARED ${SRCS_DBOW2})
+add_library(DBoW2 ${LIB_TYPE} ${SRCS_DBOW2})
 target_link_libraries(DBoW2 ${OpenCV_LIBS})
 
