@@ -4,8 +4,8 @@ OPENCV_DIR=/home/iago/graffter/libs/opencv/opencv-4.1.1/build_linux_contrib_stat
 echo "--> Building DBoW2 library..."
 cd Thirdparty/DBoW2
 mkdir build && cd build
-cmake -Wno-dev -DCMAKE_BUILD_TYPE=Release -D OpenCV_DIR=$OPENCV_DIR -DCMAKE_INSTALL_PREFIX=../install ..
-make install -j
+cmake -Wno-dev -DCMAKE_BUILD_TYPE=Release -D OpenCV_DIR=$OPENCV_DIR ..
+make -j
 cd ../../..
 
 #cd Thirdparty/eigen

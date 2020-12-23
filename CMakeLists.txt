@@ -101,17 +101,28 @@ message("-- Pangolin_INCLUDE_DIRS=${Pangolin_INCLUDE_DIRS}")
 include_directories(${Pangolin_INCLUDE_DIRS})
 
 IF(ANDROID)
-    set( BOOST_SERIALIZATION_LIB "${CMAKE_SOURCE_DIR}/Thirdparty/Boost-for-Android/build/out/${ANDROID_ABI}/lib/libboost_serialization-clang-mt-a64-1_74.a")
-ELSE()
-    set( BOOST_SERIALIZATION_LIB boost_serialization)
-ENDIF()
+    set(Boost_DEBUG TRUE)
+    set(Boost_COMPILER clang)
+    set(Boost_USE_STATIC_LIBS TRUE)
+    set(BOOST_OUT_CMAKE_DIR ${CMAKE_SOURCE_DIR}/Thirdparty/Boost-for-Android/build/out/${ANDROID_ABI}/lib/cmake)
+    set(Boost_DIR ${BOOST_OUT_CMAKE_DIR}/Boost-1.74.0)
+    set(boost_headers_DIR ${BOOST_OUT_CMAKE_DIR}/boost_headers-1.74.0)
+    set(boost_serialization_DIR ${BOOST_OUT_CMAKE_DIR}/boost_serialization-1.74.0)
+endif()
+
+find_package(Boost COMPONENTS serialization)
+message("-- Boost_FOUND=${Boost_FOUND}")
+message("-- Boost_LIBRARIES=${Boost_LIBRARIES}")
+message("-- Boost_INCLUDE_DIRS=${Boost_INCLUDE_DIRS}")
+include_directories(${Boost_INCLUDE_DIRS})
+
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
 ${DBoW2_LIBS}
 ${g2o_LIBS}
-${BOOST_SERIALIZATION_LIB}
+${Boost_LIBRARIES}
 )
 
 ############################## Executalbes ##############################
